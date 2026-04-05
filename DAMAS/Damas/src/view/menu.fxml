@@ -1,0 +1,73 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.scene.layout.AnchorPane?>
+<?import javafx.scene.layout.StackPane?>
+<?import javafx.scene.layout.VBox?>
+<?import javafx.scene.control.Button?>
+<?import javafx.scene.image.ImageView?>
+<?import javafx.scene.image.Image?>
+
+
+<AnchorPane xmlns:fx="http://javafx.com/fxml"
+         fx:controller="controller.MenuController"
+         prefWidth="900" prefHeight="600">
+
+
+         
+<children>
+
+    <!-- imagen para el menu -->
+    <ImageView fitWidth="900" fitHeight="600" preserveRatio="false"
+               AnchorPane.topAnchor="0"
+               AnchorPane.bottomAnchor="0"
+               AnchorPane.leftAnchor="0"
+               AnchorPane.rightAnchor="0">
+
+        <image>
+            <Image url="@/img/menu.jpg"/>
+        </image>
+    </ImageView>
+
+
+    <StackPane style="-fx-background-color: rgba(0,0,0,0.3);"
+               AnchorPane.topAnchor="0"
+               AnchorPane.bottomAnchor="0"
+               AnchorPane.leftAnchor="0"
+               AnchorPane.rightAnchor="0"/>
+
+    <!-- botones -->
+    <VBox alignment="CENTER"
+          spacing="20"
+          AnchorPane.topAnchor="0"
+          AnchorPane.bottomAnchor="0"
+          AnchorPane.leftAnchor="0"
+          AnchorPane.rightAnchor="0">
+
+        <Button text="▶ Jugar"
+                onAction="#irJuego"
+                style="
+                -fx-font-size: 22;
+                -fx-background-color: #28a745;
+                -fx-text-fill: white;
+                -fx-background-radius: 15;
+                -fx-padding: 12 40;
+                -fx-effect: dropshadow(gaussian, black, 10, 0.5, 0, 0);
+                "/>
+
+        <Button text="Instrucciones"
+                onAction="#verInstrucciones"
+                style="
+                -fx-font-size: 16;
+                -fx-background-color: transparent;
+                -fx-border-color: white;
+                -fx-text-fill: white;
+                -fx-border-radius: 10;
+                -fx-padding: 10 25;
+                "/>
+
+    </VBox>
+
+</children>
+
+
+</AnchorPane>
