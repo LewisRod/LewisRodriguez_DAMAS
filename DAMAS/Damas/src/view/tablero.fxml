@@ -36,7 +36,7 @@
 <center>
     <GridPane fx:id="root"
               alignment="CENTER"
-             style="-fx-padding: 20; -fx-background-color: #d2a679; -fx-border-color: #5a3e1b; -fx-border-width: 8; -fx-effect: dropshadow(gaussian, black, 10, 0.5, 0, 0);">
+             style="-fx-padding: 20; -fx-background-color: BLACK; -fx-border-color: #5a3e1b; -fx-border-width: 8; -fx-effect: dropshadow(gaussian, black, 10, 0.5, 0, 0);">
 
         
         <!-- FILA 0 -->
