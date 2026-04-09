@@ -66,69 +66,85 @@ public class Damas {
     // permite mover una pieza de una posicion a otra
     public boolean mover(int filaOrigen, int colOrigen, int filaDestino, int colDestino) {
 
-        Piezas pieza = tablero[filaOrigen][colOrigen];
+    Piezas pieza = tablero[filaOrigen][colOrigen];
 
-        if (pieza == null)
-            return false;
+    if (pieza == null)
+        return false;
 
-        if (!pieza.getColor().equals(turno))
-            return false;
+    if (!pieza.getColor().equals(turno))
+        return false;
 
-        if (tablero[filaDestino][colDestino] != null)
-            return false;
+    if (tablero[filaDestino][colDestino] != null)
+        return false;
 
-        int diferenciaFila = filaDestino - filaOrigen;
-        int diferenciaCol = colDestino - colOrigen;
+    int diferenciaFila = filaDestino - filaOrigen;
+    int diferenciaCol = colDestino - colOrigen;
 
-        // para movimiento normal
-        if ((diferenciaFila == 1 || diferenciaFila == -1) && (diferenciaCol == 1 || diferenciaCol == -1)) {
+    //movimiento normal
+    if ((diferenciaFila == 1 || diferenciaFila == -1) &&
+        (diferenciaCol == 1 || diferenciaCol == -1)) {
 
-            if ((pieza.getColor().equals(BLANCO) && diferenciaFila == -1) ||
-                    (pieza.getColor().equals(NEGRO) && diferenciaFila == 1)) {
+    
+        if (pieza.getEsDama() ||
+            (pieza.getColor().equals(BLANCO) && diferenciaFila == -1) ||
+            (pieza.getColor().equals(NEGRO) && diferenciaFila == 1)) {
+
+            tablero[filaDestino][colDestino] = pieza;
+            tablero[filaOrigen][colOrigen] = null;
+
+            // para coronar una pieza
+            if (pieza.getColor().equals(BLANCO) && filaDestino == 0) {
+                pieza.setEsDama(true);
+            }
+            if (pieza.getColor().equals(NEGRO) && filaDestino == 7) {
+                pieza.setEsDama(true);
+            }
+
+            return true;
+        }
+    }
+
+    //para captura con una pieza dama
+    if ((diferenciaFila == 2 || diferenciaFila == -2) &&
+        (diferenciaCol == 2 || diferenciaCol == -2)) {
+
+        int filaMedio = (filaOrigen + filaDestino) / 2;
+        int colMedio = (colOrigen + colDestino) / 2;
+
+        Piezas piezaEnemiga = tablero[filaMedio][colMedio];
+
+        if (piezaEnemiga != null &&
+            !piezaEnemiga.getColor().equals(pieza.getColor())) {
+
+            if (pieza.getEsDama() ||
+                (pieza.getColor().equals(BLANCO) && diferenciaFila == -2) ||
+                (pieza.getColor().equals(NEGRO) && diferenciaFila == 2)) {
 
                 tablero[filaDestino][colDestino] = pieza;
                 tablero[filaOrigen][colOrigen] = null;
 
+                tablero[filaMedio][colMedio] = null;
+
+                if (pieza.getColor().equals(BLANCO)) {
+                    puntajeBlancas++;
+                } else {
+                    puntajeNegras++;
+                }
+
+                if (pieza.getColor().equals(BLANCO) && filaDestino == 0) {
+                    pieza.setEsDama(true);
+                }
+                if (pieza.getColor().equals(NEGRO) && filaDestino == 7) {
+                    pieza.setEsDama(true);
+                }
+
                 return true;
             }
         }
-
-
-        
-        // para la captura (salto de 2 casillas)
-        if ((diferenciaFila == 2 || diferenciaFila == -2) && (diferenciaCol == 2 || diferenciaCol == -2)) {
-
-            int filaMedio = (filaOrigen + filaDestino) / 2;
-            int colMedio = (colOrigen + colDestino) / 2;
-
-            Piezas piezaEnemiga = tablero[filaMedio][colMedio];
-
-            // verificar que hay pieza enemiga en medio
-            if (piezaEnemiga != null && !piezaEnemiga.getColor().equals(pieza.getColor())) {
-
-                if ((pieza.getColor().equals(BLANCO) && diferenciaFila == -2) ||
-                        (pieza.getColor().equals(NEGRO) && diferenciaFila == 2)) {
-
-                    tablero[filaDestino][colDestino] = pieza;
-                    tablero[filaOrigen][colOrigen] = null;
-
-                    // se elimina la pieza capturada
-                    tablero[filaMedio][colMedio] = null;
-
-                    // sumar al puntaje
-                    if (pieza.getColor().equals(BLANCO)) {
-                        puntajeBlancas++;
-                    } else {
-                        puntajeNegras++;
-                    }
-
-                    return true;
-                }
-            }
-        }
-
-        return false;
     }
+
+    return false;
+}
 
 
     public boolean puedeCapturar(int fila, int col) {
@@ -140,7 +156,12 @@ public class Damas {
         if (pieza == null)
             return false;
 
-        if (pieza.getColor().equals(BLANCO)) {
+        if (pieza.getEsDama()) {
+            direcciones = new int[][] {
+                    { -1, -1 }, { -1, 1 },
+                    { 1, -1 }, { 1, 1 }
+            };
+        } else if (pieza.getColor().equals(BLANCO)) {
             direcciones = new int[][] { { -1, -1 }, { -1, 1 } };
         } else {
             direcciones = new int[][] { { 1, -1 }, { 1, 1 } };
@@ -196,6 +217,7 @@ public class Damas {
     }
 
 
+    
     public void cambiarTurno() {
         if (turno.equals(BLANCO)) {
             turno = NEGRO;

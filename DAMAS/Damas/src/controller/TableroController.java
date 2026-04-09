@@ -100,6 +100,12 @@ public class TableroController {
                         circle.setFill(Color.BLACK);
                     }
 
+                    // para marcar las piezas que son damas
+                    if (pieza.getEsDama()) {
+                        circle.setStroke(Color.RED);
+                        circle.setStrokeWidth(6);
+                    }
+
                     if (fila == filaSeleccionada && col == colSeleccionada) {
                         circle.setStroke(Color.GOLD);
                         circle.setStrokeWidth(4);
@@ -121,8 +127,6 @@ public class TableroController {
         puntajeBlancas.setText(String.valueOf(modelo.getPuntajeBlancas()));
         puntajeNegras.setText(String.valueOf(modelo.getPuntajeNegras()));
     }
-
-
 
     private void clickCelda(int fila, int col) {
 
@@ -189,8 +193,6 @@ public class TableroController {
         inicializarPiezas();
     }
 
-
-
     private void calcularMovimientos(int filaOrigen, int colOrigen) {
 
         movimientosValidos.clear();
@@ -204,7 +206,16 @@ public class TableroController {
 
         int[][] direcciones;
 
-        if (pieza.getColor().equals(Damas.BLANCO)) {
+        /*
+        para el manejo de los movimiento cuando una 
+        pieza se vuelve dama, puede moverse hacia atras
+        y hacia adelante */
+        if (pieza.getEsDama()) {
+            direcciones = new int[][] {
+                    { -1, -1 }, { -1, 1 },
+                    { 1, -1 }, { 1, 1 }
+            };
+        } else if (pieza.getColor().equals(Damas.BLANCO)) {
             direcciones = new int[][] { { -1, -1 }, { -1, 1 } };
         } else {
             direcciones = new int[][] { { 1, -1 }, { 1, 1 } };
@@ -237,8 +248,9 @@ public class TableroController {
         }
 
         /*
-         si no hay capturas para esa pieza, y no hay capturas globales, entonces
-         calcula movimientos normales */
+         * si no hay capturas para esa pieza, y no hay capturas globales, entonces
+         * calcula movimientos normales
+         */
         if (!hayCaptura && !hayCapturaGlobal) {
 
             for (int[] direccion : direcciones) {
