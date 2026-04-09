@@ -1,6 +1,7 @@
 package controller;
 
 import javafx.scene.Node;
+import javafx.scene.control.Label;
 import javafx.scene.layout.GridPane;
 import javafx.scene.layout.StackPane;
 import javafx.scene.shape.Circle;
@@ -17,6 +18,15 @@ public class TableroController {
     @FXML
     private GridPane root;
 
+    @FXML
+    private Label lblTurno;
+
+    @FXML
+    private Label puntajeBlancas;
+
+    @FXML
+    private Label puntajeNegras;
+
     private List<int[]> movimientosValidos = new ArrayList<>();
 
     private Damas modelo;
@@ -24,7 +34,7 @@ public class TableroController {
     private int filaSeleccionada = -1;
     private int colSeleccionada = -1;
 
-
+    private boolean enMulticaptura = false;
 
     @FXML
     private void initialize() {
@@ -32,8 +42,7 @@ public class TableroController {
         inicializarPiezas();
     }
 
-
-    // Para generar las piezas del tablero negras y blancas
+    // Inicializar las piezas en el tablero con sus posiciones iniciales
     @FXML
     private void inicializarPiezas() {
 
@@ -62,12 +71,9 @@ public class TableroController {
                     col = colTemp;
                 }
 
-                celda.setOnMouseClicked(e -> clickCelda(fila, col)); // para los clicks en cada celda
+                celda.setOnMouseClicked(e -> clickCelda(fila, col));
 
-                celda.getChildren().removeIf(n -> n instanceof Circle); /*
-                                                                         * limpiar la celda antes de agregar la pieza,
-                                                                         * para evitar duplicados al reiniciar el juego
-                                                                         */
+                celda.getChildren().removeIf(n -> n instanceof Circle);
 
                 Piezas pieza = modelo.getPieza(fila, col);
 
@@ -77,9 +83,9 @@ public class TableroController {
                     rectangulo.setFill(Color.web("#855e32"));
                 }
 
-                // marca los movimientos validos de las piezas
-                for (int[] movimiento : movimientosValidos) {
-                    if (fila == movimiento[0] && col == movimiento[1]) {
+                // para marcar los movimientos validos
+                for (int[] mov : movimientosValidos) {
+                    if (fila == mov[0] && col == mov[1]) {
                         rectangulo.setFill(Color.GREENYELLOW);
                     }
                 }
@@ -94,7 +100,6 @@ public class TableroController {
                         circle.setFill(Color.BLACK);
                     }
 
-                    // para resaltar la pieza seleccionada
                     if (fila == filaSeleccionada && col == colSeleccionada) {
                         circle.setStroke(Color.GOLD);
                         circle.setStrokeWidth(4);
@@ -104,18 +109,37 @@ public class TableroController {
                 }
             }
         }
+
+        // para mostrar en el panel izquierdo el turno actual
+        if (modelo.getTurno().equals(Damas.BLANCO)) {
+            lblTurno.setText("Turno: Blancas");
+        } else {
+            lblTurno.setText("Turno: Negras");
+        }
+
+        // para llevar el conteo de las piezas capturadas
+        puntajeBlancas.setText(String.valueOf(modelo.getPuntajeBlancas()));
+        puntajeNegras.setText(String.valueOf(modelo.getPuntajeNegras()));
     }
 
 
 
-    // para el click en una celda del tablero
     private void clickCelda(int fila, int col) {
 
         Piezas pieza = modelo.getPieza(fila, col);
 
         if (filaSeleccionada == -1) {
 
-            if (pieza != null) {
+            if (pieza != null && pieza.getColor().equals(modelo.getTurno())) {
+
+                // captura obligatoria
+                if (modelo.hayCapturaDisponible(modelo.getTurno()) &&
+                        !modelo.puedeCapturar(fila, col)) {
+
+                    System.out.println("Debes capturar");
+                    return;
+                }
+
                 filaSeleccionada = fila;
                 colSeleccionada = col;
 
@@ -124,18 +148,37 @@ public class TableroController {
 
         } else {
 
-            // solo se mueve si esta en movimientos validos
             boolean esValido = false;
 
-            for (int[] movimiento : movimientosValidos) {
-                if (movimiento[0] == fila && movimiento[1] == col) {
+            for (int[] mov : movimientosValidos) {
+                if (mov[0] == fila && mov[1] == col) {
                     esValido = true;
                     break;
                 }
             }
 
             if (esValido) {
+
+                boolean fueCaptura = (fila - filaSeleccionada == 2) || (fila - filaSeleccionada == -2);
+
                 modelo.mover(filaSeleccionada, colSeleccionada, fila, col);
+
+                // si hubo captura, verifica si hay multicaptura disponible para la pieza que
+                // acaba de mover
+                if (fueCaptura && modelo.puedeCapturar(fila, col)) {
+
+                    enMulticaptura = true;
+
+                    filaSeleccionada = fila;
+                    colSeleccionada = col;
+
+                    calcularMovimientos(fila, col);
+                    inicializarPiezas();
+                    return;
+                }
+
+                modelo.cambiarTurno();
+                enMulticaptura = false;
             }
 
             filaSeleccionada = -1;
@@ -148,33 +191,66 @@ public class TableroController {
 
 
 
-    
-    // calcular movimientos validos para la pieza seleccionada
     private void calcularMovimientos(int filaOrigen, int colOrigen) {
 
         movimientosValidos.clear();
 
-        Piezas piezaSeleccionada = modelo.getPieza(filaOrigen, colOrigen);
+        Piezas pieza = modelo.getPieza(filaOrigen, colOrigen);
 
-        int[][] direccionesMovimiento;
+        if (pieza == null)
+            return;
 
-        if (piezaSeleccionada.getColor().equals(Damas.BLANCO)) {
-            direccionesMovimiento = new int[][] {{ -1, -1}, { -1, 1}};
+        boolean hayCapturaGlobal = modelo.hayCapturaDisponible(modelo.getTurno());
+
+        int[][] direcciones;
+
+        if (pieza.getColor().equals(Damas.BLANCO)) {
+            direcciones = new int[][] { { -1, -1 }, { -1, 1 } };
         } else {
-            direccionesMovimiento = new int[][] {{ 1, -1 }, { 1, 1 }};
+            direcciones = new int[][] { { 1, -1 }, { 1, 1 } };
         }
 
-        for (int[] direccion : direccionesMovimiento) {
+        boolean hayCaptura = false;
 
-            int filaDestino = filaOrigen + direccion[0];
-            int colDestino = colOrigen + direccion[1];
+        // para calcular si hay capturas disponibles para esa pieza
+        for (int[] direccion : direcciones) {
 
-            // validar que este dentro del tablero
+            int filaMedio = filaOrigen + direccion[0];
+            int colMedio = colOrigen + direccion[1];
+
+            int filaDestino = filaOrigen + direccion[0] * 2;
+            int colDestino = colOrigen + direccion[1] * 2;
+
             if (filaDestino >= 0 && filaDestino < 8 && colDestino >= 0 && colDestino < 8) {
 
-                // verificar que la casilla esta vacia
                 if (modelo.getPieza(filaDestino, colDestino) == null) {
-                    movimientosValidos.add(new int[] { filaDestino, colDestino });
+
+                    Piezas enemigo = modelo.getPieza(filaMedio, colMedio);
+
+                    if (enemigo != null && !enemigo.getColor().equals(pieza.getColor())) {
+
+                        movimientosValidos.add(new int[] { filaDestino, colDestino });
+                        hayCaptura = true;
+                    }
+                }
+            }
+        }
+
+        /*
+         si no hay capturas para esa pieza, y no hay capturas globales, entonces
+         calcula movimientos normales */
+        if (!hayCaptura && !hayCapturaGlobal) {
+
+            for (int[] direccion : direcciones) {
+
+                int filaDestino = filaOrigen + direccion[0];
+                int colDestino = colOrigen + direccion[1];
+
+                if (filaDestino >= 0 && filaDestino < 8 && colDestino >= 0 && colDestino < 8) {
+
+                    if (modelo.getPieza(filaDestino, colDestino) == null) {
+                        movimientosValidos.add(new int[] { filaDestino, colDestino });
+                    }
                 }
             }
         }
@@ -182,7 +258,6 @@ public class TableroController {
 
     @FXML
     public void cerrarJuego() {
-
     }
 
     @FXML
@@ -192,5 +267,4 @@ public class TableroController {
     @FXML
     public void reiniciarJuego() {
     }
-
 }

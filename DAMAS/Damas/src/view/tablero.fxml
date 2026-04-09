@@ -23,10 +23,10 @@
         <Label text="PUNTAJE" style="-fx-font-size: 20; -fx-font-weight: bold; -fx-text-fill: white;"/>
 
         <Label text="Jugador blancas:" style="-fx-text-fill: white;"/>
-        <Label fx:id="score1" text="0" style="-fx-text-fill: white;"/>
+        <Label fx:id="puntajeBlancas" text="0" style="-fx-text-fill: white;"/>
 
         <Label text="Jugador negras:" style="-fx-text-fill: white;"/>
-        <Label fx:id="score2" text="0" style="-fx-text-fill: white;"/>
+        <Label fx:id="puntajeNegras" text="0" style="-fx-text-fill: white;"/>
     </VBox>
 </left>
 
