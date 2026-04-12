@@ -8,65 +8,72 @@
 <?import javafx.scene.image.Image?>
 
 
-<AnchorPane xmlns:fx="http://javafx.com/fxml"
-         fx:controller="controller.MenuController"
-         prefWidth="900" prefHeight="600">
+<AnchorPane fx:id="root"
+            xmlns:fx="http://javafx.com/fxml"
+            fx:controller="controller.MenuController">
+
+    <children>
+
+        <!--imagen del menu-->
+        <ImageView
+    fitWidth="${root.width}"
+    fitHeight="${root.height}"
+    preserveRatio="false"
+    AnchorPane.topAnchor="0"
+    AnchorPane.bottomAnchor="0"
+    AnchorPane.leftAnchor="0"
+    AnchorPane.rightAnchor="0">
+
+            <image>
+                <Image url="@/img/MENU.png" />
+            </image>
+        </ImageView>
 
 
-         
-<children>
+        <StackPane style="-fx-background-color: rgba(0,0,0,0.2);"
+            AnchorPane.topAnchor="0"
+            AnchorPane.bottomAnchor="0"
+            AnchorPane.leftAnchor="0"
+            AnchorPane.rightAnchor="0" />
 
-    <!-- imagen para el menu -->
-    <ImageView fitWidth="900" fitHeight="600" preserveRatio="false"
-               AnchorPane.topAnchor="0"
-               AnchorPane.bottomAnchor="0"
-               AnchorPane.leftAnchor="0"
-               AnchorPane.rightAnchor="0">
+        <!-- los botones -->
+        <VBox alignment="CENTER"
+            spacing="20"
+            AnchorPane.topAnchor="0"
+            AnchorPane.bottomAnchor="0"
+            AnchorPane.leftAnchor="0"
+            AnchorPane.rightAnchor="0">
 
-        <image>
-            <Image url="@/img/menu.jpg"/>
-        </image>
-    </ImageView>
+            <ImageView
+                fitWidth="250"
+                preserveRatio="true"
+                onMouseClicked="#irJuego"
+                onMouseEntered="#hoverIniciar"
+                onMouseExited="#salirHoverIniciar"
+                style="-fx-cursor: hand;">
+
+                <image>
+                    <Image url="@/img/botonInicioJuego.png" />
+                </image>
+
+            </ImageView>
 
 
-    <StackPane style="-fx-background-color: rgba(0,0,0,0.3);"
-               AnchorPane.topAnchor="0"
-               AnchorPane.bottomAnchor="0"
-               AnchorPane.leftAnchor="0"
-               AnchorPane.rightAnchor="0"/>
+            <ImageView
+                fitWidth="200"
+                preserveRatio="true"
+                onMouseClicked="#verInstrucciones"
+                 onMouseEntered="#hoverIniciar"
+                onMouseExited="#salirHoverIniciar"
+                style="-fx-cursor: hand;">
 
-    <!-- botones -->
-    <VBox alignment="CENTER"
-          spacing="20"
-          AnchorPane.topAnchor="0"
-          AnchorPane.bottomAnchor="0"
-          AnchorPane.leftAnchor="0"
-          AnchorPane.rightAnchor="0">
+                <image>
+                    <Image url="@/img/verInstruccioness.png" />
+                </image>
+            </ImageView>
 
-        <Button text="▶ Jugar"
-                onAction="#irJuego"
-                style="
-                -fx-font-size: 22;
-                -fx-background-color: #28a745;
-                -fx-text-fill: white;
-                -fx-background-radius: 15;
-                -fx-padding: 12 40;
-                -fx-effect: dropshadow(gaussian, black, 10, 0.5, 0, 0);
-                "/>
+        </VBox>
 
-        <Button text="Instrucciones"
-                onAction="#verInstrucciones"
-                style="
-                -fx-font-size: 16;
-                -fx-background-color: transparent;
-                -fx-border-color: white;
-                -fx-text-fill: white;
-                -fx-border-radius: 10;
-                -fx-padding: 10 25;
-                "/>
-
-    </VBox>
-
-</children>
+    </children>
 
 </AnchorPane>

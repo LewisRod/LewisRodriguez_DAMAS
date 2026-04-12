@@ -12,7 +12,7 @@ public class Main extends Application {
         FXMLLoader loader = new FXMLLoader(getClass().getResource("/view/menu.fxml"));
         Parent root = loader.load();
 
-        Scene scene = new Scene(root, 850, 600);
+        Scene scene = new Scene(root,865,600);
 
         stage.setTitle("Juego de Damas");
         stage.setScene(scene);

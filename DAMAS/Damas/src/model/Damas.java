@@ -2,24 +2,30 @@ package model;
 
 public class Damas {
 
-    // constantes para los colores de las piezas
+    //constantes para los colores
     public static final String BLANCO = "BLANCO";
     public static final String NEGRO = "NEGRO";
 
+
+    //tablero logico
     private Piezas[][] tablero;
     private String turno;
 
     private int puntajeBlancas = 0;
     private int puntajeNegras = 0;
 
-    // constructor
+
+    
+    //Constructor con valores inicializados
     public Damas() {
         tablero = new Piezas[8][8];
         turno = BLANCO;
         inicializar();
     }
 
-    // getters
+
+
+    //getters
     public Piezas getPieza(int fila, int col) {
         return tablero[fila][col];
     }
@@ -40,22 +46,21 @@ public class Damas {
         return puntajeNegras;
     }
 
-    // inicializar el tablero
-    private void inicializar() {
 
+
+
+    //para colocar las piezas en sus posiciones iniciales
+    private void inicializar() {
         for (int fila = 0; fila < 8; fila++) {
             for (int col = 0; col < 8; col++) {
 
-                // casillas oscuras
+                //posicionar en casilas oscuras
                 if ((fila + col) % 2 != 0) {
 
-                    // negras arriba
+                    //arriba van las negras, abajo las blancas
                     if (fila < 3) {
                         tablero[fila][col] = new Piezas(NEGRO);
-                    }
-
-                    // blancas abajo
-                    else if (fila > 4) {
+                    } else if (fila > 4) {
                         tablero[fila][col] = new Piezas(BLANCO);
                     }
                 }
@@ -63,74 +68,43 @@ public class Damas {
         }
     }
 
-    // permite mover una pieza de una posicion a otra
-    public boolean mover(int filaOrigen, int colOrigen, int filaDestino, int colDestino) {
 
-    Piezas pieza = tablero[filaOrigen][colOrigen];
 
-    if (pieza == null)
-        return false;
-
-    if (!pieza.getColor().equals(turno))
-        return false;
-
-    if (tablero[filaDestino][colDestino] != null)
-        return false;
-
-    int diferenciaFila = filaDestino - filaOrigen;
-    int diferenciaCol = colDestino - colOrigen;
-
-    //movimiento normal
-    if ((diferenciaFila == 1 || diferenciaFila == -1) &&
-        (diferenciaCol == 1 || diferenciaCol == -1)) {
 
     
-        if (pieza.getEsDama() ||
-            (pieza.getColor().equals(BLANCO) && diferenciaFila == -1) ||
-            (pieza.getColor().equals(NEGRO) && diferenciaFila == 1)) {
+    public boolean mover(int filaOrigen, int colOrigen, int filaDestino, int colDestino) {
 
-            tablero[filaDestino][colDestino] = pieza;
-            tablero[filaOrigen][colOrigen] = null;
+        Piezas pieza = tablero[filaOrigen][colOrigen];
 
-            // para coronar una pieza
-            if (pieza.getColor().equals(BLANCO) && filaDestino == 0) {
-                pieza.setEsDama(true);
-            }
-            if (pieza.getColor().equals(NEGRO) && filaDestino == 7) {
-                pieza.setEsDama(true);
-            }
 
-            return true;
-        }
-    }
+        //validaciones para mover una pieza
+        if (pieza == null)
+             return false;
 
-    //para captura con una pieza dama
-    if ((diferenciaFila == 2 || diferenciaFila == -2) &&
-        (diferenciaCol == 2 || diferenciaCol == -2)) {
+        if (!pieza.getColor().equals(turno))
+             return false;
 
-        int filaMedio = (filaOrigen + filaDestino) / 2;
-        int colMedio = (colOrigen + colDestino) / 2;
+        if (tablero[filaDestino][colDestino] != null)
+             return false;
 
-        Piezas piezaEnemiga = tablero[filaMedio][colMedio];
 
-        if (piezaEnemiga != null &&
-            !piezaEnemiga.getColor().equals(pieza.getColor())) {
+        //determinar donde se movio una pieza
+        int diferenciaFila = filaDestino - filaOrigen;
+        int diferenciaCol = colDestino - colOrigen;
+
+
+        //para verificar si una pieza realiza un movimiento en la direccion correcta
+        if ((diferenciaFila == 1 || diferenciaFila == -1) && (diferenciaCol == 1 || diferenciaCol == -1)) {
 
             if (pieza.getEsDama() ||
-                (pieza.getColor().equals(BLANCO) && diferenciaFila == -2) ||
-                (pieza.getColor().equals(NEGRO) && diferenciaFila == 2)) {
+                (pieza.getColor().equals(BLANCO) && diferenciaFila == -1) ||
+                (pieza.getColor().equals(NEGRO) && diferenciaFila == 1)) {
 
+                //mueve la pieza en el tablero logico y luego el controlador actualiza la interfaz para reflejar ese cambio.
                 tablero[filaDestino][colDestino] = pieza;
                 tablero[filaOrigen][colOrigen] = null;
 
-                tablero[filaMedio][colMedio] = null;
-
-                if (pieza.getColor().equals(BLANCO)) {
-                    puntajeBlancas++;
-                } else {
-                    puntajeNegras++;
-                }
-
+                //para la coronacion de una pieza
                 if (pieza.getColor().equals(BLANCO) && filaDestino == 0) {
                     pieza.setEsDama(true);
                 }
@@ -141,20 +115,64 @@ public class Damas {
                 return true;
             }
         }
+
+
+
+        if ((diferenciaFila == 2 || diferenciaFila == -2) &&
+            (diferenciaCol == 2 || diferenciaCol == -2)) {
+
+            //para calcular la posicion de la pieza a capturar
+            int filaMedio = (filaOrigen + filaDestino) / 2;
+            int colMedio = (colOrigen + colDestino) / 2;
+
+            Piezas piezaEnemiga = tablero[filaMedio][colMedio];
+
+            if (piezaEnemiga != null && !piezaEnemiga.getColor().equals(pieza.getColor())) {
+
+                //ejecuta el movimiento
+                tablero[filaDestino][colDestino] = pieza;
+                tablero[filaOrigen][colOrigen] = null;
+
+                //elimina la ficha capturada
+                tablero[filaMedio][colMedio] = null;
+
+                //se incrementa el puntaje de la pieza que captura
+                if (pieza.getColor().equals(BLANCO)) {
+                    puntajeBlancas++;
+                } else {
+                    puntajeNegras++;
+                }
+
+                // coronacion de pieza
+                if (pieza.getColor().equals(BLANCO) && filaDestino == 0) {
+                    pieza.setEsDama(true);
+                }
+                if (pieza.getColor().equals(NEGRO) && filaDestino == 7) {
+                    pieza.setEsDama(true);
+                }
+
+                return true;
+            }
+        }
+
+        return false;
     }
 
-    return false;
-}
+
+
+
 
 
     public boolean puedeCapturar(int fila, int col) {
 
         Piezas pieza = tablero[fila][col];
 
-        int[][] direcciones;
-
         if (pieza == null)
-            return false;
+             return false;
+
+
+        //determinar las direcciones posibles para la captura
+        int[][] direcciones;
 
         if (pieza.getEsDama()) {
             direcciones = new int[][] {
@@ -167,20 +185,26 @@ public class Damas {
             direcciones = new int[][] { { 1, -1 }, { 1, 1 } };
         }
 
-        for (int[] direccion : direcciones) {
 
-            int filaMedio = fila + direccion[0];
-            int colMedio = col + direccion[1];
+        for (int[] d : direcciones) {
 
-            int filaDestino = fila + direccion[0] * 2;
-            int colDestino = col + direccion[1] * 2;
+            //determinar donde esta la pieza a capturar
+            int filaMedio = fila + d[0];
+            int colMedio = col + d[1];
 
+            //calcular la posicion de destino despues de la captura
+            int filaDestino = fila + d[0] * 2;
+            int colDestino = col + d[1] * 2;
+
+
+            //validar que la posicion de destino este dentro del tablero y que la casilla este vacia
             if (filaDestino >= 0 && filaDestino < 8 && colDestino >= 0 && colDestino < 8) {
 
                 if (tablero[filaDestino][colDestino] == null) {
 
+                    //validar que la pieza a capturar sea del color contrario y que este dentro del tablero
                     if (filaMedio < 0 || filaMedio >= 8 || colMedio < 0 || colMedio >= 8)
-                        continue;
+                         continue;
 
                     Piezas enemigo = tablero[filaMedio][colMedio];
 
@@ -194,6 +218,8 @@ public class Damas {
 
         return false;
     }
+
+
 
 
 
@@ -217,13 +243,39 @@ public class Damas {
     }
 
 
-    
+
+
+
     public void cambiarTurno() {
         if (turno.equals(BLANCO)) {
             turno = NEGRO;
         } else {
-            turno = BLANCO;
+           turno = BLANCO;
         }
     }
 
+
+
+    public String obtenerGanador() {
+
+        int blancas = 0;
+        int negras = 0;
+
+        for (int fila = 0; fila < 8; fila++) {
+            for (int col = 0; col < 8; col++) {
+                if (tablero[fila][col] != null) {
+                    if (tablero[fila][col].getColor().equals(BLANCO)) {
+                        blancas++;
+                    } else {
+                        negras++;
+                    }
+                }
+            }
+        }
+
+        if (blancas == 0) return "NEGRAS";
+        if (negras == 0) return "BLANCAS";
+
+        return null;
+    }
 }
